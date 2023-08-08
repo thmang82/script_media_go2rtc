@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "strict": true, 
+        "alwaysStrict": true,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "noImplicitReturns": true,
+        "esModuleInterop": true,
+        "target": "es2018",
+        "module": "commonjs",
+        "sourceMap": true,
+        "rootDir": "./../",
+        "baseUrl": "./",
+        "outDir": "js_out",
+        "skipLibCheck": true,
+        "paths": {
+            "@script_types/*": [ "../toolchain/types/*" ],
+            "*": [ "../toolchain/types/ts_lib/*" ]
+        },
+        "typeRoots": [
+            "../toolchain/types/ts_lib"
+        ]
+    },
+    "exclude": [
+        "gen/js_out",
+    ]
+}
