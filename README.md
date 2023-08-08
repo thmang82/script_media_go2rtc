@@ -6,7 +6,7 @@ This is a data source script for the home script worker
 - Ident:    'go2rtc'
 - Provides: 'camera_webrtc'
 
-The script enables WebRTC to use video streams from the go2rtc server:
+The script enables to show WebRTC video streams from the go2rtc server:
 https://github.com/AlexxIT/go2rtc
 
 With go2rtc you can translate RTSP streams from webcams into WebRTC streams.
