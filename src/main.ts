@@ -27,6 +27,8 @@ export class Instance {
 
         this.ctx.ui.registerConfigOptionsProvider(this.configOptionsRequest);
 
+        this.getProducers(); // initial fetch of producers
+
         console.log("Start done!");
     }
 
@@ -39,27 +41,38 @@ export class Instance {
         this.connections = [];
     }
 
+    public getProducers = async () => {
+        if (this.config.server_url) {
+            let url = this.config.server_url.value;
+            if (!url.startsWith("http")) {
+                url = `http://${url}`;
+            }
+            url = `${url}/api/streams`;
+            console.debug("req streams: " + url);
+            const res = await this.ctx.data.http.getJson(url);
+            if (!res.error && res.statusCode == 200) {
+                const data = <{[ident: string]: { producers: { url: string }[] | null }}> res.body;
+                console.debug("found streams: ", data);
+                return data;
+            }  else {
+                console.error("Getting streams failed: ", res.statusCode, res.error);
+            }
+        } else {
+            console.warn("Getting streams: URL not configured!")
+        }
+        return undefined;
+    }
+
     private configOptionsRequest: ScriptCtxUI.ConfigOptionsCallback = async (request) => {
         if (request.source == "widget") {
             if (request.parameter_ident == "stream_id") {
-                if (this.config.server_url) {
-                    let url = this.config.server_url.value;
-                    if (!url.startsWith("http")) {
-                        url = `http://${url}`;
-                    }
-                    url = `${url}/api/streams`;
-                    console.debug("req streams: " + url);
-                    const res = await this.ctx.data.http.getJson(url);
-                    if (!res.error && res.statusCode == 200) {
-                        const data = <{[ident: string]: { producers: { url: string }[] | null }}> res.body;
-                        let dropdown_entries: ParameterType.DropdownEntry[] = [];
-                        Object.keys(data).forEach(key => {
-                            dropdown_entries.push({ value: key, name: key });
-                        })
-                        return { dropdown_entries };
-                    } else {
-                        console.error("Getting streams failed: ", res.statusCode, res.error);
-                    }
+                const data = await this.getProducers();
+                if (data) {
+                    let dropdown_entries: ParameterType.DropdownEntry[] = [];
+                    Object.keys(data).forEach(key => {
+                        dropdown_entries.push({ value: key, name: key });
+                    })
+                    return { dropdown_entries };
                 }
             } else {
                 console.warn("Unknown parameter: ", request.parameter_ident);
