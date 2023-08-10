@@ -53,32 +53,42 @@ export class Instance {
             if (!res.error && res.statusCode == 200) {
                 const data = <{[ident: string]: { producers: { url: string }[] | null }}> res.body;
                 console.debug("found streams: ", data);
-                return data;
-            }  else {
+                return { producers: data };
+            } else {
                 console.error("Getting streams failed: ", res.statusCode, res.error);
+                return {
+                    error: "Error: " + res.statusCode + ": " + res.error
+                }
             }
         } else {
             console.warn("Getting streams: URL not configured!")
+            return { no_url: true };
         }
-        return undefined;
     }
 
     private configOptionsRequest: ScriptCtxUI.ConfigOptionsCallback = async (request) => {
         if (request.source == "widget") {
             if (request.parameter_ident == "stream_id") {
                 const data = await this.getProducers();
-                if (data) {
+                if (data && data.producers) {
                     let dropdown_entries: ParameterType.DropdownEntry[] = [];
                     Object.keys(data).forEach(key => {
                         dropdown_entries.push({ value: key, name: key });
                     })
                     return { dropdown_entries };
+                } else {
+                    if (data.no_url) {
+                        return { error: "Missing URL Parameter" };
+                    }
+                    return { error: data.error ? data.error : "UnknownError" };
                 }
             } else {
                 console.warn("Unknown parameter: ", request.parameter_ident);
             }
         }
-        return undefined;
+        return {
+            no_data: "UnknownID"
+        };
     };
 
     // ----------- The script funtionality --------------------
