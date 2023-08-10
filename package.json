@@ -1,6 +1,6 @@
 {
     "name": "script-media-go2rtc",
-    "version": "0.8.3",
+    "version": "0.8.4",
     "description": "define at src/spec.ts",
     "main": "src/script.ts",
     "config": {
