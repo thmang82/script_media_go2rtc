@@ -10,12 +10,19 @@ import { sleep } from "./helper";
 export class Instance {
     private ctx: Script.Context;
     private config: ScriptConfig;
+    private conf_url: string | undefined;
     
     private connections: Connection[] = [];
     
     constructor(ctx: Script.Context, config: ScriptConfig) {
         this.ctx = ctx;
         this.config = config;
+
+        let url = this.config.server_url?.value;
+        if (url) {
+            this.conf_url = url.replace("http://", "").replace("ws://", "");
+            console.log("URL is: ", this.conf_url);
+        }
     }
 
     public start = async () => {
@@ -42,8 +49,8 @@ export class Instance {
     }
 
     public getProducers = async () => {
-        if (this.config.server_url) {
-            let url = this.config.server_url.value;
+        if (this.conf_url) {
+            let url = this.conf_url;
             if (!url.startsWith("http")) {
                 url = `http://${url}`;
             }
@@ -95,9 +102,8 @@ export class Instance {
 
 
     private getWebsocketUrl = (stream_id: string): string | undefined => {
-        const url_o = this.config?.server_url;
-        if (url_o) {
-            let url = url_o.value;
+        let url = this.conf_url;
+        if (url) {
             if (!url.startsWith("ws://")) {
                 url = "ws://" + url;
             }
