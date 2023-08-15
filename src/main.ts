@@ -77,9 +77,10 @@ export class Instance {
         if (request.source == "widget") {
             if (request.parameter_ident == "stream_id") {
                 const data = await this.getProducers();
-                if (data && data.producers) {
+                const producers = data?.producers;
+                if (producers) {
                     let dropdown_entries: ParameterType.DropdownEntry[] = [];
-                    Object.keys(data).forEach(key => {
+                    Object.keys(producers).forEach(key => {
                         dropdown_entries.push({ value: key, name: key });
                     })
                     return { dropdown_entries };
